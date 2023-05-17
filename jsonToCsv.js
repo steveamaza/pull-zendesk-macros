@@ -4,11 +4,10 @@ require('dotenv').config();
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const request = require('request-promise');
 
-var jsonData = [];
 var api_url = 'https://paystack.zendesk.com/api/v2/macros/active.json?active=true';
 
 async function fetchData() {
-  var count = 0;
+  var jsonData = [];
 
   do {
     const options = {
@@ -22,7 +21,7 @@ async function fetchData() {
 
     try {
       const response = await request(options);
-      jsonData.push(JSON.parse(response).macros); // Assign the response to jsonData
+      jsonData.push(...JSON.parse(response).macros); // Assign the response macros to jsonData
       api_url = JSON.parse(response).next_page;
     } catch (error) {
       throw new Error(error);
@@ -31,17 +30,6 @@ async function fetchData() {
   
   return jsonData;
 }
-
-// Call fetchData() and handle the result
-fetchData()
-  .then((result) => {
-    // Use the updated jsonData outside the fetchData() function
-    console.log(result);
-  })
-  .catch((error) => {
-    console.error(error);
-  });
-
 
 async function writeDataToCsv() {
   try {
